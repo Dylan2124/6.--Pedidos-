@@ -46,7 +46,7 @@ public class PedidoService {
             pedido.setTotal(totalPedido);
 
             Pedido savedPedido = pedidoRepository.save(pedido);
-            log.info("Pedido creado exitosamente con ID: {}", savedPedido.getIdPedido());
+            log.info("Pedido creado exitosamente con ID: {}", savedPedido.getId());
 
             return mapToDto(savedPedido);
         } catch (Exception e) {
@@ -86,7 +86,7 @@ public class PedidoService {
     private PedidoDto mapToDto(Pedido pedido) {
         List<DetallePedidoDto> detallesDto = pedido.getDetalles().stream().map(d -> 
             DetallePedidoDto.builder()
-                .idDetalle(d.getIdDetalle())
+                .id(d.getId())
                 .idProducto(d.getIdProducto())
                 .cantidad(d.getCantidad())
                 .precioUnitario(d.getPrecioUnitario())
@@ -94,7 +94,7 @@ public class PedidoService {
         ).collect(Collectors.toList());
 
         return PedidoDto.builder()
-                .idPedido(pedido.getIdPedido())
+                .id(pedido.getId())
                 .idUsuario(pedido.getIdUsuario())
                 .fechaCreacion(pedido.getFechaCreacion())
                 .estado(pedido.getEstado())

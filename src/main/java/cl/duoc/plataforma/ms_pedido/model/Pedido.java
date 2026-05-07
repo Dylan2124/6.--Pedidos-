@@ -20,7 +20,7 @@ public class Pedido {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idPedido;
+    private Long id;
 
     @Column(nullable = false)
     private Integer idUsuario;

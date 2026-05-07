@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DetallePedidoDto {
 
-    private Long idDetalle;
+    private Long id;
 
     @NotNull(message = "El idProducto es obligatorio")
     private Integer idProducto;

@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PedidoDto {
 
-    private Long idPedido;
+    private Long id;
 
     @NotNull(message = "El idUsuario es obligatorio")
     private Integer idUsuario;
