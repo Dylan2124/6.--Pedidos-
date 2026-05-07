@@ -7,6 +7,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * ═══════════════════════════════════════════════════
+ * CLASE: DetallePedidoDto.java
+ * DTO para transportar la información de los productos
+ * dentro de un pedido.
+ * ═══════════════════════════════════════════════════
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -18,6 +25,9 @@ public class DetallePedidoDto {
     @NotNull(message = "El idProducto es obligatorio")
     private Integer idProducto;
 
+    /**
+     * @Min(1) asegura que no puedan pedir "0" productos o cantidades negativas.
+     */
     @NotNull(message = "La cantidad es obligatoria")
     @Min(value = 1, message = "La cantidad debe ser mayor a 0")
     private Integer cantidad;
