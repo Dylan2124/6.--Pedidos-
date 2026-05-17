@@ -21,7 +21,7 @@ El microservicio utiliza **Jakarta Bean Validation** (JSR 380) para asegurar la 
 | `detalles[i].idProducto` | `@NotNull` | `400 Bad Request` | `"El idProducto es obligatorio"` |
 | `detalles[i].cantidad` | `@NotNull`, `@Min(1)` | `400 Bad Request` | `"La cantidad debe ser mayor a 0"` |
 | `detalles[i].precioUnitario` | `@NotNull`, `@Min(1)` | `400 Bad Request` | `"El precio unitario debe ser mayor a 0"` |
-| **Buscar/Actualizar inexistente** | `Optional.orElse(404)` | `404 Not Found` | Cuerpo de respuesta vacío |
+| **Buscar/Actualizar inexistente** | `Optional.orElseGet(404)` | `404 Not Found` | JSON conteniendo el detalle `"Pedido no encontrado con el ID: ..."` |
 
 ---
 
@@ -273,19 +273,31 @@ Prueba la capacidad del `GlobalExceptionHandler` para acumular todos los fallos 
 ---
 
 # 🔴 Escenarios de Error: Recursos Inexistentes (HTTP 404 Not Found)
-Casos diseñados para validar que cuando se busca o se intenta modificar un recurso que no existe, la API responda de forma semántica y segura.
+Casos diseñados para validar que cuando se busca o se intenta modificar un recurso que no existe, la API responda con un código de estado semántico `404` y un cuerpo estructurado con el detalle del error.
 
 ### 11. Error: Buscar un Pedido Inexistente
 * **Método:** `GET`
 * **URL:** `http://localhost:8086/api/pedidos/9999`
 * **Respuesta de Error Esperada (HTTP 404 Not Found):**
-  *(Cuerpo de respuesta vacío)*
+  ```json
+  {
+    "timestamp": "2026-05-17T03:27:00.123456",
+    "status": 404,
+    "error": "Pedido no encontrado con el ID: 9999"
+  }
+  ```
 
 ### 12. Error: Actualizar Estado de un Pedido Inexistente
 * **Método:** `PUT`
 * **URL:** `http://localhost:8086/api/pedidos/9999/estado?estado=PAGADO`
 * **Respuesta de Error Esperada (HTTP 404 Not Found):**
-  *(Cuerpo de respuesta vacío)*
+  ```json
+  {
+    "timestamp": "2026-05-17T03:28:00.123456",
+    "status": 404,
+    "error": "Pedido no encontrado con el ID: 9999"
+  }
+  ```
 
 ---
 
@@ -314,9 +326,14 @@ pm.test("Precio unitario negativo capturado", function () {
 });
 ```
 
-### Validar que la respuesta para un pedido inexistente sea un 404 Not Found:
+### Validar que la respuesta para un pedido inexistente sea un 404 Not Found y contenga el cuerpo estructurado:
 ```javascript
 pm.test("Status code is 404", function () {
     pm.response.to.have.status(404);
+});
+
+pm.test("Valida mensaje de no encontrado", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData.error).to.include("Pedido no encontrado con el ID");
 });
 ```

@@ -8,7 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * ═══════════════════════════════════════════════════
@@ -51,10 +55,17 @@ public class PedidoController {
      * Endpoint para obtener un solo pedido utilizando su ID.
      */
     @GetMapping("/{idPedido}")
-    public ResponseEntity<PedidoDto> obtenerPedidoPorId(@PathVariable Long idPedido) {
-        return pedidoService.obtenerPedidoPorId(idPedido)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> obtenerPedidoPorId(@PathVariable Long idPedido) {
+        Optional<PedidoDto> pedidoOpt = pedidoService.obtenerPedidoPorId(idPedido);
+        if (pedidoOpt.isPresent()) {
+            return ResponseEntity.ok(pedidoOpt.get());
+        } else {
+            Map<String, Object> errorBody = new HashMap<>();
+            errorBody.put("timestamp", LocalDateTime.now());
+            errorBody.put("status", HttpStatus.NOT_FOUND.value());
+            errorBody.put("error", "Pedido no encontrado con el ID: " + idPedido);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorBody);
+        }
     }
 
     /**
@@ -62,9 +73,16 @@ public class PedidoController {
      * @RequestParam captura el valor enviado como un parámetro de la URL (ej: ?estado=PAGADO)
      */
     @PutMapping("/{idPedido}/estado")
-    public ResponseEntity<PedidoDto> actualizarEstado(@PathVariable Long idPedido, @RequestParam String estado) {
-        return pedidoService.actualizarEstado(idPedido, estado)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> actualizarEstado(@PathVariable Long idPedido, @RequestParam String estado) {
+        Optional<PedidoDto> pedidoOpt = pedidoService.actualizarEstado(idPedido, estado);
+        if (pedidoOpt.isPresent()) {
+            return ResponseEntity.ok(pedidoOpt.get());
+        } else {
+            Map<String, Object> errorBody = new HashMap<>();
+            errorBody.put("timestamp", LocalDateTime.now());
+            errorBody.put("status", HttpStatus.NOT_FOUND.value());
+            errorBody.put("error", "Pedido no encontrado con el ID: " + idPedido);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorBody);
+        }
     }
 }

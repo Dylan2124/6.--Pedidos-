@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Evidencias y pruebas locales
+EVIDENCIA_PRUEBAS.md
+GUIA_EVIDENCIAS.md
