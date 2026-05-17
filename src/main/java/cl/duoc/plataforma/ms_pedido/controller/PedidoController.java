@@ -52,8 +52,9 @@ public class PedidoController {
      */
     @GetMapping("/{idPedido}")
     public ResponseEntity<PedidoDto> obtenerPedidoPorId(@PathVariable Long idPedido) {
-        PedidoDto pedido = pedidoService.obtenerPedidoPorId(idPedido);
-        return ResponseEntity.ok(pedido);
+        return pedidoService.obtenerPedidoPorId(idPedido)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     /**
@@ -62,7 +63,8 @@ public class PedidoController {
      */
     @PutMapping("/{idPedido}/estado")
     public ResponseEntity<PedidoDto> actualizarEstado(@PathVariable Long idPedido, @RequestParam String estado) {
-        PedidoDto pedidoActualizado = pedidoService.actualizarEstado(idPedido, estado);
-        return ResponseEntity.ok(pedidoActualizado);
+        return pedidoService.actualizarEstado(idPedido, estado)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

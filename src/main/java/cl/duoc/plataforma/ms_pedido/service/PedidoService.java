@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -91,23 +92,21 @@ public class PedidoService {
     }
 
     @Transactional(readOnly = true)
-    public PedidoDto obtenerPedidoPorId(Long idPedido) {
+    public Optional<PedidoDto> obtenerPedidoPorId(Long idPedido) {
         log.info("Buscando pedido específico por ID: {}", idPedido);
-        Pedido pedido = pedidoRepository.findById(idPedido)
-                .orElseThrow(() -> new RuntimeException("Pedido no encontrado con el ID: " + idPedido));
-        return mapToDto(pedido);
+        return pedidoRepository.findById(idPedido)
+                .map(this::mapToDto);
     }
 
     @Transactional
-    public PedidoDto actualizarEstado(Long idPedido, String nuevoEstado) {
+    public Optional<PedidoDto> actualizarEstado(Long idPedido, String nuevoEstado) {
         log.info("Solicitud para actualizar estado del pedido ID: {} a '{}'", idPedido, nuevoEstado);
-        Pedido pedido = pedidoRepository.findById(idPedido)
-                .orElseThrow(() -> new RuntimeException("Pedido no encontrado con el ID: " + idPedido));
-        
-        pedido.setEstado(nuevoEstado);
-        Pedido updatedPedido = pedidoRepository.save(pedido);
-        
-        return mapToDto(updatedPedido);
+        return pedidoRepository.findById(idPedido)
+                .map(pedido -> {
+                    pedido.setEstado(nuevoEstado);
+                    Pedido updatedPedido = pedidoRepository.save(pedido);
+                    return mapToDto(updatedPedido);
+                });
     }
 
     /**

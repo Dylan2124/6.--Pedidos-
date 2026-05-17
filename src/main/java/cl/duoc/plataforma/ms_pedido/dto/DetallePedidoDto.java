@@ -33,6 +33,6 @@ public class DetallePedidoDto {
     private Integer cantidad;
 
     @NotNull(message = "El precio unitario es obligatorio")
-    @Min(value = 0, message = "El precio unitario no puede ser negativo")
+    @Min(value = 1, message = "El precio unitario debe ser mayor a 0") // Ajustado para que no pueda tener valor 0
     private Integer precioUnitario;
 }
