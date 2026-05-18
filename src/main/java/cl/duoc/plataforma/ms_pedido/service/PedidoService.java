@@ -7,8 +7,11 @@ import cl.duoc.plataforma.ms_pedido.model.Pedido;
 import cl.duoc.plataforma.ms_pedido.repository.PedidoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import cl.duoc.plataforma.ms_pedido.client.InventarioClient;
+import cl.duoc.plataforma.ms_pedido.dto.DescuentoStockRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,6 +35,7 @@ import java.util.stream.Collectors;
 public class PedidoService {
 
     private final PedidoRepository pedidoRepository;
+    private final InventarioClient inventarioClient;
 
     /**
      * @Transactional asegura que si ocurre un error a mitad del proceso, 
@@ -62,6 +66,21 @@ public class PedidoService {
                 
                 // Usamos el método Helper definido en la entidad para enlazar la relación
                 pedido.addDetalle(detalle);
+            }
+
+            // 3. Llamada al Microservicio de Inventario para descontar el stock
+            try {
+                log.info("Comunicando con ms-inventario para descontar stock...");
+                List<DescuentoStockRequest> listaDescuentos = pedidoDto.getDetalles().stream()
+                        .map(d -> new DescuentoStockRequest(d.getIdProducto(), d.getCantidad()))
+                        .collect(Collectors.toList());
+                        
+                inventarioClient.descontarStock(listaDescuentos);
+                log.info("Stock descontado exitosamente en ms-inventario.");
+            } catch (Exception e) {
+                // Tolerancia a fallos: Registramos el error pero permitimos que el pedido se guarde
+                // de lo contrario, si el equipo de inventario no ha terminado, nuestro servicio fallaría.
+                log.warn("ATENCION: No se pudo comunicar con ms-inventario para descontar stock. El pedido continuará su curso. Error: {}", e.getMessage());
             }
 
             // 3. Establecemos el total calculado dinámicamente
