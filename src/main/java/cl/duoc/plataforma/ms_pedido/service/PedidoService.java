@@ -72,7 +72,7 @@ public class PedidoService {
             try {
                 log.info("Comunicando con ms-inventario para descontar stock...");
                 List<DescuentoStockRequest> listaDescuentos = pedidoDto.getDetalles().stream()
-                        .map(d -> new DescuentoStockRequest(d.getIdProducto(), d.getCantidad()))
+                        .map(d -> new DescuentoStockRequest(Long.valueOf(d.getIdProducto()), d.getCantidad()))
                         .collect(Collectors.toList());
                         
                 inventarioClient.descontarStock(listaDescuentos);
